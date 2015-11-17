@@ -1,19 +1,37 @@
+TIRE_WIDTH_FACTOR = 250
+FRONT_SUSPENSION_FACTOR = 100
+REAR_SUSPENSION_FACTOR = 150
+
+
 class RigidBikeSpec
-  def initialize
-    @commision = 0.25
+  def initialize (tire_width: nil)
+    @tire_width = tire_width
+    @commission = 0.25
     @base_price = 490
   end
 
   def price
     (1 + @commission) * @base_price
   end
+
+  def off_road_ability
+    result = @tire_width * TIRE_WIDTH_FACTOR
+  end
+
 end
 
 class FrontSuspensionBikeSpec
-  def initialize
-    @commision = 0.25
+  def initialize (tire_width: nil, front_fork_travel: nil)
+    @tire_width = tire_width
+    @front_fork_travel = front_fork_travel
+    @commission = 0.25
     @base_price = 490
     @front_suspension_price = 95.0
+  end
+
+  def off_road_ability
+    result = @tire_width * TIRE_WIDTH_FACTOR
+    result += @front_fork_travel * FRONT_SUSPENSION_FACTOR
   end
 
   def price
@@ -23,9 +41,15 @@ end
 
 class FullSuspensionBikeSpec
   def initialize
-    @commision = 0.25
+    @commission = 0.25
     @base_price = 490
     @front_suspension_price = 95.0
+  end
+
+  def off_road_ability
+    result = @tire_width * TIRE_WIDTH_FACTOR
+    result += @front_fork_travel * FRONT_SUSPENSION_FACTOR
+    result += @rear_fork_travel * REAR_SUSPENSION_FACTOR
   end
 
   def price
@@ -34,43 +58,17 @@ class FullSuspensionBikeSpec
 end
 
 class MountainBike
-
-  TIRE_WIDTH_FACTOR = 250
-  FRONT_SUSPENSION_FACTOR = 100
-  REAR_SUSPENSION_FACTOR = 150
-
   def initialize(bike_spec, params)
     params.each { |key, value| instance_variable_set "@#{key}", value }
-
-    @commission = 0.25
-    @front_suspension_price = 95.0
-    @rear_suspension_price = 67.0
-    @base_price = 490.00
-
     @bike_spec = bike_spec
   end
 
   def off_road_ability
-    result = @tire_width * TIRE_WIDTH_FACTOR
-    if @type_code == :front_suspension || @type_code == :full_suspension
-      result += @front_fork_travel * FRONT_SUSPENSION_FACTOR
-    end
-    if @type_code == :full_suspension
-      result += @rear_fork_travel * REAR_SUSPENSION_FACTOR
-    end
-    result
+    @bike_spec.off_road_ability
   end
-
+  
   def price
-    case @type_code
-    when :rigid
-      (1 + @commission) * @base_price
-    when :front_suspension
-      (1 + @commission) * @base_price + @front_suspension_price
-    when :full_suspension
-      (1 + @commission) * @base_price + @front_suspension_price +
-        @rear_suspension_price
-    end
+    @bike_spec.price
   end
 
   def owner
@@ -89,15 +87,15 @@ require 'minitest/autorun'
 class TestMountainBike
   describe MountainBike do
     def setup
-      @pitos_bike = MountainBike.new(RigidBikeSpec.new, :owner => "Pito", :type_code => :rigid, :tire_width => 2.5)
-      @ricks_bike = MountainBike.new(FrontSuspensionBikeSpec.new, :owner => "Rick", :type_code => :front_suspension, :tire_width => 2, :front_fork_travel => 3)
+      @pitos_bike = MountainBike.new(RigidBikeSpec.new(tire_width: 2.5) , :owner => "Pito", :type_code => :rigid, :tire_width => 2.5)
+      @ricks_bike = MountainBike.new(FrontSuspensionBikeSpec.new(tire_width: 2.0, front_fork_travel: 3), :owner => "Rick", :type_code => :front_suspension, :tire_width => 2, :front_fork_travel => 3)
     end
 
     it "knows price of pitos_bike" do
       @pitos_bike.price.must_equal 612.5
     end
 
-    it "knows offroad abilituy of pitos bike" do
+    it "knows offroad ability of pitos bike" do
       @pitos_bike.off_road_ability.must_equal 625.0
     end
 
@@ -105,7 +103,7 @@ class TestMountainBike
       @ricks_bike.price.must_equal 707.5
     end
 
-    it "knows offroad abilituy of ricks bike" do
+    it "knows offroad ability of ricks bike" do
       @ricks_bike.off_road_ability.must_equal 800
     end
   end
