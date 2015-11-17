@@ -1,15 +1,17 @@
+#### BikeSpecs: Described fixed characteristics of different kinds of Mountain Bikes
 class BikeSpec
   TIRE_WIDTH_FACTOR = 250
   FRONT_SUSPENSION_FACTOR = 100
   REAR_SUSPENSION_FACTOR = 150
 
-  def initialize(tire_width: nil, front_fork_travel: nil)
+  def initialize(tire_width: nil, front_fork_travel: nil, owner: nil)
     @commission = 0.25
     @base_price = 490
     @front_suspension_price = 95.0
     @rear_suspension_price = 78.0
     @tire_width = tire_width
     @front_fork_travel = front_fork_travel
+    @owner = owner
   end
 end
 
@@ -47,9 +49,10 @@ class FullSuspensionBikeSpec < BikeSpec
   end
 end
 
+
+#### Describes one particular bike
 class MountainBike
-  def initialize(bike_spec, params)
-    params.each { |key, value| instance_variable_set "@#{key}", value }
+  def initialize(bike_spec)
     @bike_spec = bike_spec
   end
 
@@ -71,14 +74,13 @@ class MountainBike
 end
 
 # Test: Normally would be in a separate file
-
 require 'minitest/autorun'
 
 class TestMountainBike
   describe MountainBike do
     def setup
-      @pitos_bike = MountainBike.new(RigidBikeSpec.new(tire_width: 2.5) , :owner => "Pito", :type_code => :rigid, :tire_width => 2.5)
-      @ricks_bike = MountainBike.new(FrontSuspensionBikeSpec.new(tire_width: 2.0, front_fork_travel: 3), :owner => "Rick", :type_code => :front_suspension, :tire_width => 2, :front_fork_travel => 3)
+      @pitos_bike = MountainBike.new(RigidBikeSpec.new(owner: "Pito", tire_width: 2.5))
+      @ricks_bike = MountainBike.new(FrontSuspensionBikeSpec.new(owner: "Rick", tire_width: 2.0, front_fork_travel: 3))
     end
 
     it "knows price of pitos_bike" do
