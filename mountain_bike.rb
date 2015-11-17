@@ -1,15 +1,19 @@
-TIRE_WIDTH_FACTOR = 250
-FRONT_SUSPENSION_FACTOR = 100
-REAR_SUSPENSION_FACTOR = 150
+class BikeSpec
+  TIRE_WIDTH_FACTOR = 250
+  FRONT_SUSPENSION_FACTOR = 100
+  REAR_SUSPENSION_FACTOR = 150
 
-
-class RigidBikeSpec
-  def initialize (tire_width: nil)
-    @tire_width = tire_width
+  def initialize(tire_width: nil, front_fork_travel: nil)
     @commission = 0.25
     @base_price = 490
+    @front_suspension_price = 95.0
+    @rear_suspension_price = 78.0
+    @tire_width = tire_width
+    @front_fork_travel = front_fork_travel
   end
+end
 
+class RigidBikeSpec < BikeSpec
   def price
     (1 + @commission) * @base_price
   end
@@ -20,15 +24,7 @@ class RigidBikeSpec
 
 end
 
-class FrontSuspensionBikeSpec
-  def initialize (tire_width: nil, front_fork_travel: nil)
-    @tire_width = tire_width
-    @front_fork_travel = front_fork_travel
-    @commission = 0.25
-    @base_price = 490
-    @front_suspension_price = 95.0
-  end
-
+class FrontSuspensionBikeSpec < BikeSpec
   def off_road_ability
     result = @tire_width * TIRE_WIDTH_FACTOR
     result += @front_fork_travel * FRONT_SUSPENSION_FACTOR
@@ -39,13 +35,7 @@ class FrontSuspensionBikeSpec
   end
 end
 
-class FullSuspensionBikeSpec
-  def initialize
-    @commission = 0.25
-    @base_price = 490
-    @front_suspension_price = 95.0
-  end
-
+class FullSuspensionBikeSpec < BikeSpec
   def off_road_ability
     result = @tire_width * TIRE_WIDTH_FACTOR
     result += @front_fork_travel * FRONT_SUSPENSION_FACTOR
@@ -96,7 +86,7 @@ class TestMountainBike
     end
 
     it "knows offroad ability of pitos bike" do
-      @pitos_bike.off_road_ability.must_equal 625.0
+      @pitos_bike.off_road_ability.must_equal 625
     end
 
     it "knows price of ricks_bike" do
@@ -106,5 +96,6 @@ class TestMountainBike
     it "knows offroad ability of ricks bike" do
       @ricks_bike.off_road_ability.must_equal 800
     end
+
   end
 end
