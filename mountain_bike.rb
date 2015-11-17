@@ -45,11 +45,30 @@ class MountainBike
 
 end
 
-pitos_bike = MountainBike.new(:owner => "Pito", :type_code => :rigid, :tire_width => 2.5)
-puts pitos_bike
+# Test: Normally would be in a separate file
 
-ricks_bike = MountainBike.new(:owner => "Rick", :type_code => :front_suspension, :tire_width => 2, :front_fork_travel => 3)
-puts ricks_bike
+require 'minitest/autorun'
 
+class TestMountainBike
+  describe MountainBike do
+    def setup
+      @pitos_bike = MountainBike.new(:owner => "Pito", :type_code => :rigid, :tire_width => 2.5)
+      @ricks_bike = MountainBike.new(:owner => "Rick", :type_code => :front_suspension, :tire_width => 2, :front_fork_travel => 3)
+    end
+    it "knows price of pitos_bike" do
+      @pitos_bike.price.must_equal 612.5
+    end
 
+    it "knows offroad abilituy of pitos bike" do
+      @pitos_bike.off_road_ability.must_equal 625.0
+    end
 
+    it "knows price of ricks_bike" do
+      @ricks_bike.price.must_equal 707.5
+    end
+
+    it "knows offroad abilituy of ricks bike" do
+      @ricks_bike.off_road_ability.must_equal 800
+    end 
+  end
+end
